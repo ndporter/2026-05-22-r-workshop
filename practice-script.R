@@ -92,3 +92,83 @@ str(output)
 interviews |> 
   count(village)
 
+# ggplot2 -----
+
+library(tidyverse)
+interviews_plotting <- read_csv("https://raw.githubusercontent.com/datacarpentry/r-socialsci/main/episodes/data/interviews_plotting.csv")
+
+write_csv(interviews_plotting,
+          file='data_output/interviews_plotting.csv')
+
+plot(interviews_plotting$no_membrs,
+     interviews_plotting$liv_count,
+     main = "Base R Scatterplot",
+     xlab = "Num of hh members",
+     ylab = "Num of livestock owned"
+     )
+
+interviews_plotting |> 
+  ggplot(aes(x=no_membrs, y=number_items)) +
+  geom_point(alpha=0.5)
+
+interviews_plotting |> 
+  ggplot(aes(x=no_membrs, y=number_items)) +
+  geom_jitter()
+
+interviews_plotting |> 
+  ggplot(aes(x=no_membrs, y=number_items)) +
+  geom_jitter(alpha=0.5,
+              color="maroon",
+             width = 0.2,
+             height=0.2)
+
+interviews_plotting |> 
+  ggplot(aes(x=no_membrs, y=number_items)) +
+  geom_jitter(aes(color=village),
+              alpha=0.5,
+              width = 0.2,
+              height=0.2)
+
+interviews_plotting |> 
+  ggplot(aes(x=no_membrs, y=number_items, color=village)) +
+  geom_jitter(alpha=0.5,
+              width = 0.2,
+              height=0.2)
+
+interviews_plotting |> 
+  filter(respondent_wall_type!="cement") |> 
+  ggplot(aes(x=respondent_wall_type, y=rooms)) +
+  geom_boxplot(outliers=FALSE) +
+  geom_jitter(alpha=0.5,
+              color='tomato',
+              width=0.2,
+              height=0.2)
+
+interviews_plotting |> 
+  ggplot(aes(x=respondent_wall_type)) +
+  geom_bar(aes(fill=village),
+           position='dodge')
+
+percent_wall_type <- interviews_plotting |> 
+  filter(respondent_wall_type!="cement") |> 
+  count(village, respondent_wall_type) |> 
+  group_by(village) |> 
+  mutate(percent = (n/sum(n))*100) |> 
+  ungroup()
+  
+percent_wall_type |> 
+  ggplot(aes(x=village, y=percent, fill=respondent_wall_type)) +
+  geom_bar(stat='identity', position='dodge') +
+  labs(title='Proportion of wall type by village',
+       fill = "Type of wall in home",
+       x="Village",
+       y="Percent")
+
+barplot <- percent_wall_type |> 
+  ggplot(aes(y=respondent_wall_type, x=percent)) +
+  geom_bar(stat='identity', position='dodge') +
+  facet_wrap(~ village) +
+  theme_bw() +
+  theme(panel.grid=element_blank())
+
+ggsave("fig_output/barplot.jpg", plot=barplot, width=15, height=10)
