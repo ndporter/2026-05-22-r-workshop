@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #test script
+=======
+#practice script
+>>>>>>> 0e2da18 (Add header)
 dir.create('data')
 dir.create('data_output')
 dir.create('fig_output')
